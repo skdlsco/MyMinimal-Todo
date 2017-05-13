@@ -1,6 +1,8 @@
 package com.example.eka.myminimal_todo;
 
 import android.animation.Animator;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -19,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -85,7 +88,13 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
             }
         }
 
-
+        back_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSaveTodo=false;
+                onBackPressed();
+            }
+        });
 
         remind_set.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +109,8 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
                     animateSetRemindLayout(isChecked);
                     isRemind=true;
                     set_remind_text();
+                    set_time_text();
+                    set_date_text();
                 }else{
                     isRemind=false;
                     animateSetRemindLayout(isChecked);
@@ -134,16 +145,28 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         if (isSaveTodo) {
             if (Add_Modi == -1) {
                 toDoItems.add(new ToDoItem(remind_title.getText().toString(), calendar, remind_switch.isChecked()));
+                Add_Modi = toDoItems.size()-1;
+                add_Alarm();
             } else {
                 toDoItems.set(Add_Modi, new ToDoItem(remind_title.getText().toString(), calendar, remind_switch.isChecked()));
+                del_Alarm();
+                if (remind_switch.isChecked()) {
+                    add_Alarm();
+                }
             }
+            SetTodoList();
         }
-        SetTodoList();
     }
 
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        Calendar calendar1= Calendar.getInstance();
+        calendar1.set(year,monthOfYear,dayOfMonth);
+        if (calendar1.getTimeInMillis() <Calendar.getInstance().getTimeInMillis()){
+            Toast.makeText(this, "과거로 돌아갈 순 없다 이놈아", Toast.LENGTH_SHORT).show();
+            return;
+        }
         calendar.set(year,monthOfYear,dayOfMonth);
         set_date_text();
     }
@@ -151,12 +174,36 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
 
     @Override
     public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
-        calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH),hourOfDay,minute);
+        Calendar calendar1= Calendar.getInstance();
+        calendar1.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH),hourOfDay,minute,0);
+        if (calendar1.getTimeInMillis() <Calendar.getInstance().getTimeInMillis()){
+            Toast.makeText(this, "과거로 돌아갈 순 없다 이놈아", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH),hourOfDay,minute,0);
         set_time_text();
     }
 
+    void add_Alarm() {
+            if(toDoItems.get(Add_Modi).isToDoChecked()) {
+                Intent intent = new Intent(this, TodoNotificationService.class);
+                intent.putExtra("todoText",toDoItems.get(Add_Modi).getContents().toString());
+                intent.putExtra("index",Add_Modi);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                PendingIntent pendingIntent = PendingIntent.getService(this, Add_Modi, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(Add_Modi).getCalendar().getTimeInMillis(), pendingIntent);
+                Log.e("asdf","set Alarm");
+            }
+        }
 
-
+    void del_Alarm() {
+            if (toDoItems.get(Add_Modi).isToDoChecked()) {
+                Intent intent = new Intent(this, MainActivity.class);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                PendingIntent pendingIntent = PendingIntent.getService(this, Add_Modi, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                alarmManager.cancel(pendingIntent);
+        }
+    }
     void set_date_text(){
         date=calendar.getTime();
         dateFormat = new SimpleDateFormat("d M월, yyyy ",new Locale("en"));
