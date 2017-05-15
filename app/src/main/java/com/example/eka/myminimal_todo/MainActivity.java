@@ -1,6 +1,7 @@
 package com.example.eka.myminimal_todo;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -63,6 +64,26 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        todo_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                int i;
+                for(i=0;i< toDoItems.size();i++){
+                    del_Alarm(i);
+                }
+                toDoItems.remove(position);
+                for(i=0;i< toDoItems.size();i++){
+                    if(toDoItems.get(i).isToDoChecked()) {
+                        add_Alarm(i);
+                    }
+                }
+                SetTodoList();
+                toDoItems.clear();
+                toDoItems.addAll(GetTodoList());
+                toDoListAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
 
     }
 
@@ -111,8 +132,6 @@ public class MainActivity extends AppCompatActivity {
         return toDoItems_;
     }
 
-
-
     public void SetTodoList(){
         SharedPreferences pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
         SharedPreferences.Editor pref_edit = pref.edit();
@@ -121,5 +140,19 @@ public class MainActivity extends AppCompatActivity {
         pref_edit.remove("ToDoList");
         pref_edit.putString("ToDoList",json);
         pref_edit.apply();
+    }
+    private void add_Alarm(int index) {
+        Intent intent = new Intent(this, TodoNotificationService.class);
+        intent.putExtra("todoText", toDoItems.get(index).getContents());
+        intent.putExtra("index",index);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(index).getCalendar().getTimeInMillis(), pendingIntent);
+    }
+    void del_Alarm(int index) {
+        Intent intent = new Intent(this, MainActivity.class);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.cancel(pendingIntent);
     }
 }

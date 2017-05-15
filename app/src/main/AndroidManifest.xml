@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.eka.myminimal_todo">
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -22,8 +23,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddTodoActivity" />
-        <activity android:name=".SettingActivity"/>
+        <activity android:name=".SettingActivity" />
+
         <service android:name=".TodoNotificationService" />
+
+        <activity android:name=".ReminderActivity"/>
     </application>
 
 </manifest>

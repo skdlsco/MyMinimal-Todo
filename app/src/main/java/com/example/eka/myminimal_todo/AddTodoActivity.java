@@ -54,7 +54,6 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
     private Date date= new Date();
 
     private boolean isSaveTodo=true;
-    private boolean isRemind=false;
     private int Add_Modi;
 
 
@@ -75,13 +74,14 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         back_btn = (ImageButton) findViewById(R.id.back_todo);
         remind_set = (FloatingActionButton) findViewById(R.id.todo_set);
 
-        set_remind_layout.setVisibility(View.GONE);
+        set_remind_layout.setVisibility(View.INVISIBLE);
+        animateSetRemindLayout(false);
         if (Add_Modi!=-1){
             calendar= toDoItems.get(Add_Modi).getCalendar();
             remind_title.setText(toDoItems.get(Add_Modi).getContents());
             if(toDoItems.get(Add_Modi).isToDoChecked()) {
                 remind_switch.setChecked(toDoItems.get(Add_Modi).isToDoChecked());
-                set_remind_layout.setVisibility(View.VISIBLE);
+                animateSetRemindLayout(remind_switch.isChecked());
                 set_time_text();
                 set_date_text();
                 set_remind_text();
@@ -107,12 +107,11 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     animateSetRemindLayout(isChecked);
-                    isRemind=true;
+                    calendar = Calendar.getInstance();
                     set_remind_text();
                     set_time_text();
                     set_date_text();
                 }else{
-                    isRemind=false;
                     animateSetRemindLayout(isChecked);
                 }
             }
@@ -143,8 +142,12 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         if(remind_title.getText().toString().equals("")) isSaveTodo=false;
 
         if (isSaveTodo) {
+            if (calendar.getTime().getTime()/10000==Calendar.getInstance().getTime().getTime()/10000){
+
+            }else
             if (Add_Modi == -1) {
                 toDoItems.add(new ToDoItem(remind_title.getText().toString(), calendar, remind_switch.isChecked()));
+
                 Add_Modi = toDoItems.size()-1;
                 add_Alarm();
             } else {
@@ -187,12 +190,11 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
     void add_Alarm() {
             if(toDoItems.get(Add_Modi).isToDoChecked()) {
                 Intent intent = new Intent(this, TodoNotificationService.class);
-                intent.putExtra("todoText",toDoItems.get(Add_Modi).getContents().toString());
+                intent.putExtra("todoText", toDoItems.get(Add_Modi).getContents());
                 intent.putExtra("index",Add_Modi);
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                 PendingIntent pendingIntent = PendingIntent.getService(this, Add_Modi, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(Add_Modi).getCalendar().getTimeInMillis(), pendingIntent);
-                Log.e("asdf","set Alarm");
             }
         }
 

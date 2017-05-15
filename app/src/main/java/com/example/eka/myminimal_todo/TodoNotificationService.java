@@ -3,11 +3,14 @@ package com.example.eka.myminimal_todo;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -38,6 +41,9 @@ public class TodoNotificationService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         index = intent.getIntExtra("index",0);
         todoText = intent.getStringExtra("todoText");
+        Context context = getApplicationContext();
+        Intent intent1 = new Intent(context,ReminderActivity.class);
+        intent1.putExtra("index",index);
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification notification = new Notification.Builder(this)
                 .setContentTitle(todoTitle)
@@ -45,8 +51,10 @@ public class TodoNotificationService extends IntentService {
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentText(todoText)
+                .setContentIntent(PendingIntent.getActivity(context,index,intent1,PendingIntent.FLAG_UPDATE_CURRENT))
                 .build();
         manager.notify(index,notification);
+
         pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
         pref_edit = pref.edit();
         json=pref.getString("ToDoList",null);
@@ -55,6 +63,5 @@ public class TodoNotificationService extends IntentService {
         json=gson.toJson(toDoItems);
         pref_edit.putString("ToDoList",json);
         pref_edit.apply();
-        toDoItems.clear();
     }
 }
