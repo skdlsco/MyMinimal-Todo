@@ -1,12 +1,10 @@
-package com.example.eka.myminimal_todo;
+package com.example.eka.myminimal_todo.Activity;
 
 import android.animation.Animator;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.Image;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +21,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.eka.myminimal_todo.R;
+import com.example.eka.myminimal_todo.ToDoItem;
+import com.example.eka.myminimal_todo.TodoNotificationService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -53,7 +54,9 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
     private SimpleDateFormat dateFormat;
     private Date date= new Date();
 
+    //현재 내용 저장 확인(X버튼시 false 등)
     private boolean isSaveTodo=true;
+    //position
     private int Add_Modi;
 
 
@@ -61,7 +64,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_todo);
-
+        //기본 선언, 초기화
         Intent intent = getIntent();
         Add_Modi = intent.getIntExtra("Add_Modi",-1);
         GetTodoList();
@@ -87,7 +90,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
                 set_remind_text();
             }
         }
-
+        //X자 버튼 클릭 리스너
         back_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,17 +143,14 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
     public void onBackPressed() {
         super.onBackPressed();
         if(remind_title.getText().toString().equals("")) isSaveTodo=false;
-
+        if (calendar.getTime().getTime()/10000==Calendar.getInstance().getTime().getTime()/10000)
+            remind_switch.setChecked(false);
         if (isSaveTodo) {
-            if (calendar.getTime().getTime()/10000==Calendar.getInstance().getTime().getTime()/10000){
-
-            }else
             if (Add_Modi == -1) {
                 toDoItems.add(new ToDoItem(remind_title.getText().toString(), calendar, remind_switch.isChecked()));
-
-                Add_Modi = toDoItems.size()-1;
+                Add_Modi = toDoItems.size() - 1;
                 add_Alarm();
-            } else {
+            }else{
                 toDoItems.set(Add_Modi, new ToDoItem(remind_title.getText().toString(), calendar, remind_switch.isChecked()));
                 del_Alarm();
                 if (remind_switch.isChecked()) {
@@ -197,7 +197,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
                 alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(Add_Modi).getCalendar().getTimeInMillis(), pendingIntent);
             }
         }
-
+    //
     void del_Alarm() {
             if (toDoItems.get(Add_Modi).isToDoChecked()) {
                 Intent intent = new Intent(this, MainActivity.class);
@@ -206,6 +206,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
                 alarmManager.cancel(pendingIntent);
         }
     }
+
     void set_date_text(){
         date=calendar.getTime();
         dateFormat = new SimpleDateFormat("d M월, yyyy ",new Locale("en"));
@@ -222,7 +223,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         dateFormat = new SimpleDateFormat("d M월, yyyy, h:mm a");
         remind_text.setText("Reminder set for "+dateFormat.format(calendar.getTime()));
     }
-
+    //아이템 정보 가져오기
     public void GetTodoList(){
         SharedPreferences pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
         SharedPreferences.Editor pref_edit = pref.edit();
@@ -233,7 +234,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
             toDoItems = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>(){}.getType());
         }
     }
-
+    // 아이템 정보 저장
     public void SetTodoList(){
         SharedPreferences pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
         SharedPreferences.Editor pref_edit = pref.edit();
@@ -245,6 +246,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         Log.e("asdf",json);
     }
 
+    //아랫 부분 레이아웃 애니메이션
     void animateSetRemindLayout(boolean checked){
         if (checked){
             set_remind_layout.animate().alpha(1.0f).setDuration(500).setListener(new Animator.AnimatorListener() {

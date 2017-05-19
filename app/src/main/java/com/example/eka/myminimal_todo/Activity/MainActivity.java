@@ -1,59 +1,57 @@
-package com.example.eka.myminimal_todo;
+package com.example.eka.myminimal_todo.Activity;
 
-import android.app.AlarmManager;
-import android.app.Dialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 
+import com.example.eka.myminimal_todo.ItemTouchHelperClass;
+import com.example.eka.myminimal_todo.R;
+import com.example.eka.myminimal_todo.ToDoItem;
+import com.example.eka.myminimal_todo.ToDoListAdapter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
     private Context context = this;
-    private ListView todo_list;
-    private ArrayList<ToDoItem> toDoItems = new ArrayList<>();
+    private RecyclerView todo_list;
+    private static ArrayList<ToDoItem> toDoItems = new ArrayList<>();
     private ToDoListAdapter toDoListAdapter;
-
+    private static LinearLayout empty_view;
+    private ItemTouchHelper itemTouchHelper;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        todo_list = (ListView) findViewById(R.id.todo_list);
+        todo_list = (RecyclerView) findViewById(R.id.todo_list);
         toDoItems=GetTodoList();
-        toDoListAdapter = new ToDoListAdapter(this,toDoItems);
+        toDoListAdapter = new ToDoListAdapter(this, toDoItems);
+        todo_list.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         todo_list.setAdapter(toDoListAdapter);
-
+        empty_view = (LinearLayout) findViewById(R.id.empty_view);
+        setEmpty_view();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        todo_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(context,AddTodoActivity.class);
-                intent.putExtra("Add_Modi",position);
-                startActivity(intent);
-            }
-        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -64,27 +62,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        todo_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                int i;
-                for(i=0;i< toDoItems.size();i++){
-                    del_Alarm(i);
-                }
-                toDoItems.remove(position);
-                for(i=0;i< toDoItems.size();i++){
-                    if(toDoItems.get(i).isToDoChecked()) {
-                        add_Alarm(i);
-                    }
-                }
-                SetTodoList();
-                toDoItems.clear();
-                toDoItems.addAll(GetTodoList());
-                toDoListAdapter.notifyDataSetChanged();
-                return true;
-            }
-        });
-
+        ItemTouchHelper.Callback callback = new ItemTouchHelperClass(toDoListAdapter,todo_list);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(todo_list);
     }
 
     @Override
@@ -93,11 +73,11 @@ public class MainActivity extends AppCompatActivity {
         toDoItems.clear();
         toDoItems.addAll(GetTodoList());
         toDoListAdapter.notifyDataSetChanged();
+        setEmpty_view();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -136,18 +116,12 @@ public class MainActivity extends AppCompatActivity {
         pref_edit.putString("ToDoList",json);
         pref_edit.apply();
     }
-    private void add_Alarm(int index) {
-        Intent intent = new Intent(this, TodoNotificationService.class);
-        intent.putExtra("todoText", toDoItems.get(index).getContents());
-        intent.putExtra("index",index);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(index).getCalendar().getTimeInMillis(), pendingIntent);
-    }
-    void del_Alarm(int index) {
-        Intent intent = new Intent(this, MainActivity.class);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmManager.cancel(pendingIntent);
+
+    public static void setEmpty_view(){
+        if(toDoItems.size()==0){
+            empty_view.setVisibility(View.VISIBLE);
+        }else{
+            empty_view.setVisibility(View.INVISIBLE);
+        }
     }
 }

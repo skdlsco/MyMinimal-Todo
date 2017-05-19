@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="10"
-    tools:context="com.example.eka.myminimal_todo.SettingActivity">
+    tools:context="com.example.eka.myminimal_todo.Activity.SettingActivity">
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize">

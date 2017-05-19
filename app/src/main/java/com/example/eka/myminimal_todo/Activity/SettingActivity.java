@@ -1,10 +1,12 @@
-package com.example.eka.myminimal_todo;
+package com.example.eka.myminimal_todo.Activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+
+import com.example.eka.myminimal_todo.R;
 
 public class SettingActivity extends AppCompatActivity{
     CheckBox mcheckBox;

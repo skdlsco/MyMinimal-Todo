@@ -1,4 +1,4 @@
-package com.example.eka.myminimal_todo;
+package com.example.eka.myminimal_todo.Activity;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,10 +12,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.eka.myminimal_todo.R;
+import com.example.eka.myminimal_todo.ToDoItem;
+import com.example.eka.myminimal_todo.TodoNotificationService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -61,6 +63,7 @@ public class ReminderActivity extends AppCompatActivity {
         done = (ImageButton) findViewById(R.id.reminder_done);
         contents = (TextView) findViewById(R.id.reminder_contents);
 
+        // 재알람 설정
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,6 +79,7 @@ public class ReminderActivity extends AppCompatActivity {
             }
         });
 
+        // 아이템 삭제
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,6 +97,8 @@ public class ReminderActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        //스피너
         String[] snooze ={"10 Minutes","30 Minutes","1 Hours"};
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.snooze_text,snooze);
         arrayAdapter.setDropDownViewResource(R.layout.snooze_text);
@@ -112,14 +118,13 @@ public class ReminderActivity extends AppCompatActivity {
                         break;
                 }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
     }
+    // 알람 설정
     private void add_Alarm(int index) {
             Intent intent = new Intent(this, TodoNotificationService.class);
             intent.putExtra("todoText", toDoItems.get(index).getContents());
@@ -128,12 +133,14 @@ public class ReminderActivity extends AppCompatActivity {
             PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(index).getCalendar().getTimeInMillis()+alarm_turm*1000, pendingIntent);
     }
+    //알람 삭제
     void del_Alarm(int index) {
             Intent intent = new Intent(this, MainActivity.class);
             AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
             PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_CANCEL_CURRENT);
             alarmManager.cancel(pendingIntent);
     }
+    //아이템 정보 가져오기
     public void getTodoList(){
         pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
         pref_edit = pref.edit();
@@ -143,7 +150,7 @@ public class ReminderActivity extends AppCompatActivity {
             toDoItems = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>(){}.getType());
         }
     }
-
+    //아이템 정보 저장하기
     public void setTodoList(){
         pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
         pref_edit = pref.edit();
