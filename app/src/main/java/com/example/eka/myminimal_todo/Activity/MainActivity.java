@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.LinearLayout;
 
 import com.example.eka.myminimal_todo.ItemTouchHelperClass;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +66,27 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper.Callback callback = new ItemTouchHelperClass(toDoListAdapter,todo_list);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(todo_list);
+
+        todo_list.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {   CoordinatorLayout.LayoutParams lp= (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                int  margin = lp.bottomMargin;
+                if (dy>0 && fab.isShown())
+                {
+                    fab.animate().translationY(fab.getHeight()+margin).setInterpolator(new AccelerateInterpolator()).start();
+                }else{
+                    fab.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
     }
 
     @Override

@@ -178,13 +178,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
         Log.e("asdf",toDoItems.size()+"");
         for(i=0;i<toDoItems.size();i++){
             del_Alarm(i);
-            Log.e("asdfdel1",toDoItems.get(i).isToDoChecked()+" "+i);
         }
         toDoItems.remove(position);
         Log.e("asdf2",toDoItems.size()+"");
         for(i=0;i<toDoItems.size();i++){
             add_Alarm(i);
-            Log.e("asdfadd1",toDoItems.get(i).isToDoChecked()+"");
         }
         notifyItemRemoved(position);
         SetTodoList();
@@ -195,13 +193,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
                         int i;
                         for(i=0;i<toDoItems.size();i++){
                             del_Alarm(i);
-                            Log.e("asdfdel2",toDoItems.get(i).isToDoChecked()+"");
                         }
                         toDoItems.add(pos,todoitem);
                         notifyItemInserted(pos);
                         for(i=0;i<toDoItems.size();i++){
                             add_Alarm(i);
-                            Log.e("asdfadd2",toDoItems.get(i).isToDoChecked()+"");
                         }
                         MainActivity.setEmpty_view();
                     }
