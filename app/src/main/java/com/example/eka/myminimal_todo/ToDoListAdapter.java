@@ -169,19 +169,18 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
 
     @Override
     public void onItemRemoved(int position ,RecyclerView rv) {
-        int i;
         View view = LayoutInflater.from(context).inflate(R.layout.activity_main,null);
         LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.empty_view);
         linearLayout.setVisibility(View.VISIBLE);
         final int pos = position;
         final ToDoItem todoitem=toDoItems.get(position);
         Log.e("asdf",toDoItems.size()+"");
-        for(i=0;i<toDoItems.size();i++){
+        for(int i=0;i<toDoItems.size();i++){
             del_Alarm(i);
         }
         toDoItems.remove(position);
         Log.e("asdf2",toDoItems.size()+"");
-        for(i=0;i<toDoItems.size();i++){
+        for(int i=0;i<toDoItems.size();i++){
             add_Alarm(i);
         }
         notifyItemRemoved(position);
@@ -190,13 +189,12 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
                 .setAction("UNDO", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int i;
-                        for(i=0;i<toDoItems.size();i++){
+                        for(int i=0;i<toDoItems.size();i++){
                             del_Alarm(i);
                         }
                         toDoItems.add(pos,todoitem);
                         notifyItemInserted(pos);
-                        for(i=0;i<toDoItems.size();i++){
+                        for(int i=0;i<toDoItems.size();i++){
                             add_Alarm(i);
                         }
                         MainActivity.setEmpty_view();
@@ -205,7 +203,6 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
                 .show();
         MainActivity.setEmpty_view();
         SetTodoList();
-
     }
 
     public static class ToDoViewHolder extends RecyclerView.ViewHolder{

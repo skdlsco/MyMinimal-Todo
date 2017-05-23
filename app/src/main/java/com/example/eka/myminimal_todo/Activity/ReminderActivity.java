@@ -83,12 +83,11 @@ public class ReminderActivity extends AppCompatActivity {
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int i;
-                for(i=0;i< toDoItems.size();i++){
+                for(int i=0;i< toDoItems.size();i++){
                     del_Alarm(i);
                 }
                 toDoItems.remove(index);
-                for(i=0;i< toDoItems.size();i++){
+                for(int i=0;i< toDoItems.size();i++){
                     if(toDoItems.get(i).isToDoChecked()) {
                         add_Alarm(i);
                     }
