@@ -36,6 +36,7 @@ public class ReminderActivity extends AppCompatActivity {
 
     private int alarm_turm;
     private int index;
+    private String todoText;
 
     private SharedPreferences pref;
     private SharedPreferences.Editor pref_edit;
@@ -53,6 +54,7 @@ public class ReminderActivity extends AppCompatActivity {
         getTodoList();
 
         Intent intent = getIntent();
+        todoText = intent.getStringExtra("todoText");
         index = intent.getIntExtra("index", -1);
         if (index < 0) {
             Toast.makeText(this, "왜알람이없지?..;", Toast.LENGTH_LONG).show();
@@ -62,7 +64,7 @@ public class ReminderActivity extends AppCompatActivity {
         remove = (Button) findViewById(R.id.reminder_remove);
         done = (ImageButton) findViewById(R.id.reminder_done);
         contents = (TextView) findViewById(R.id.reminder_contents);
-
+        contents.setText(todoText);
         // 재알람 설정
         done.setOnClickListener(new View.OnClickListener() {
             @Override

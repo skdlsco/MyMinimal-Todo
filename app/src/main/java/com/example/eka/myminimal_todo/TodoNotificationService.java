@@ -44,6 +44,7 @@ public class TodoNotificationService extends IntentService {
         Context context = getApplicationContext();
         Intent intent1 = new Intent(context, ReminderActivity.class);
         intent1.putExtra("index", index);
+        intent1.putExtra("todoText",todoText);
         Log.e("noti index", index + "");
         //상단바에띄우기
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
