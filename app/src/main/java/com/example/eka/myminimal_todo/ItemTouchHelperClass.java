@@ -10,15 +10,18 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 public class ItemTouchHelperClass extends ItemTouchHelper.Callback {
     ItemTouchHelperAdapter adapter;
     RecyclerView rv;
-    public interface ItemTouchHelperAdapter{
-        void onItemMoved(int fromPosition,int toPosition);
-        void onItemRemoved(int position ,RecyclerView rv);
+
+    public interface ItemTouchHelperAdapter {
+        void onItemMoved(int fromPosition, int toPosition);
+
+        void onItemRemoved(int position, RecyclerView rv);
     }
 
-    public ItemTouchHelperClass(ItemTouchHelperAdapter adapter,RecyclerView rv) {
+    public ItemTouchHelperClass(ItemTouchHelperAdapter adapter, RecyclerView rv) {
         this.adapter = adapter;
-        this.rv =rv;
+        this.rv = rv;
     }
+
     @Override
     public boolean isLongPressDragEnabled() {
         return true;
@@ -31,9 +34,9 @@ public class ItemTouchHelperClass extends ItemTouchHelper.Callback {
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        int dragFlags = ItemTouchHelper.UP|ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.START|ItemTouchHelper.END;
-        return makeMovementFlags(dragFlags,swipeFlags);
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        return makeMovementFlags(dragFlags, swipeFlags);
     }
 
     @Override
@@ -44,7 +47,7 @@ public class ItemTouchHelperClass extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        adapter.onItemRemoved(viewHolder.getAdapterPosition() , rv);
+        adapter.onItemRemoved(viewHolder.getAdapterPosition(), rv);
     }
 
 }

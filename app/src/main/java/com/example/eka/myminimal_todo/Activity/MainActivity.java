@@ -39,51 +39,53 @@ public class MainActivity extends AppCompatActivity {
     private ToDoListAdapter toDoListAdapter;
     private static LinearLayout empty_view;
     private ItemTouchHelper itemTouchHelper;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         todo_list = (RecyclerView) findViewById(R.id.todo_list);
-        toDoItems=GetTodoList();
+        toDoItems = GetTodoList();
         toDoListAdapter = new ToDoListAdapter(this, toDoItems);
-        todo_list.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-        todo_list.setAdapter(toDoListAdapter);
         empty_view = (LinearLayout) findViewById(R.id.empty_view);
+
         setEmpty_view();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        todo_list.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        todo_list.setAdapter(toDoListAdapter);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context,AddTodoActivity.class);
-                intent.putExtra("Add_Modi",-1);
+                Intent intent = new Intent(context, AddTodoActivity.class);
+                intent.putExtra("Add_Modi", -1);
                 startActivity(intent);
             }
         });
-        ItemTouchHelper.Callback callback = new ItemTouchHelperClass(toDoListAdapter,todo_list);
+        ItemTouchHelper.Callback callback = new ItemTouchHelperClass(toDoListAdapter, todo_list);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(todo_list);
 
-        todo_list.addOnScrollListener(new RecyclerView.OnScrollListener()
-        {
+        todo_list.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-            {   CoordinatorLayout.LayoutParams lp= (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-                int  margin = lp.bottomMargin;
-                if (dy>0 && fab.isShown())
-                {
-                    fab.animate().translationY(fab.getHeight()+margin).setInterpolator(new AccelerateInterpolator()).start();
-                }else{
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                int margin = lp.bottomMargin;
+                if (dy > 0 && fab.isShown()) {
+                    fab.animate().translationY(fab.getHeight() + margin).setInterpolator(new AccelerateInterpolator()).start();
+                } else {
                     fab.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
                 }
             }
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });
@@ -106,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent= new Intent(this,SettingActivity.class);
+                Intent intent = new Intent(this, SettingActivity.class);
                 startActivity(intent);
                 return true;
             default:
@@ -116,33 +118,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public ArrayList<ToDoItem> GetTodoList(){
-        SharedPreferences pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
+    public ArrayList<ToDoItem> GetTodoList() {
+        SharedPreferences pref = getSharedPreferences("ToDoList", MODE_PRIVATE);
         SharedPreferences.Editor pref_edit = pref.edit();
         Gson gson = new Gson();
-        String json = pref.getString("ToDoList","null");
-        Log.e("json",json);
+        String json = pref.getString("ToDoList", "null");
+        Log.e("json", json);
         ArrayList<ToDoItem> toDoItems_ = new ArrayList<>();
-        if(json !="null") {
-            toDoItems_ = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>(){}.getType());
+        if (json != "null") {
+            toDoItems_ = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>() {
+            }.getType());
         }
         return toDoItems_;
     }
 
-    public void SetTodoList(){
-        SharedPreferences pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
+    public void SetTodoList() {
+        SharedPreferences pref = getSharedPreferences("ToDoList", MODE_PRIVATE);
         SharedPreferences.Editor pref_edit = pref.edit();
         Gson gson = new Gson();
         String json = gson.toJson(toDoItems);
         pref_edit.remove("ToDoList");
-        pref_edit.putString("ToDoList",json);
+        pref_edit.putString("ToDoList", json);
         pref_edit.apply();
     }
 
-    public static void setEmpty_view(){
-        if(toDoItems.size()==0){
+    public static void setEmpty_view() {
+        if (toDoItems.size() == 0) {
             empty_view.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             empty_view.setVisibility(View.INVISIBLE);
         }
     }

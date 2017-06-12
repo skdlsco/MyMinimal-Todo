@@ -31,9 +31,10 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by eka on 2017. 5. 13..
  */
 
-public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoViewHolder> implements ItemTouchHelperClass.ItemTouchHelperAdapter{
+public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoViewHolder> implements ItemTouchHelperClass.ItemTouchHelperAdapter {
     ArrayList<ToDoItem> toDoItems = new ArrayList<>();
     Context context;
+
     public ToDoListAdapter(Context context, ArrayList<ToDoItem> toDoItem) {
         this.context = context;
         this.toDoItems = toDoItem;
@@ -42,7 +43,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
     @Override
     public ToDoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 //      View view= LayoutInflater.from(context).inflate(R.layout.todo_list_content,null);
-        View view= LayoutInflater.from(context).inflate(R.layout.todo_list_content,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.todo_list_content, parent, false);
 
 //      2 view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return new ToDoViewHolder(view);
@@ -93,9 +94,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
 //
 //        });
     }
+
     @Override
     public int getItemCount() {
-        return  toDoItems.size();
+        return toDoItems.size();
     }
 
     // 알람 생성
@@ -109,57 +111,60 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
             alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(pos).getCalendar().getTimeInMillis(), pendingIntent);
         }
     }
+
     // 알람 삭제
     void del_Alarm(int pos) {
-            Intent intent = new Intent(context, TodoNotificationService.class);
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-            PendingIntent pendingIntent = PendingIntent.getService(context, pos, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-            pendingIntent.cancel();
-            alarmManager.cancel(pendingIntent);
+        Intent intent = new Intent(context, TodoNotificationService.class);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(context, pos, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        pendingIntent.cancel();
+        alarmManager.cancel(pendingIntent);
     }
+
     // 아이템 정보 가져오기
-    public ArrayList<ToDoItem> GetTodoList(){
-        SharedPreferences pref = context.getSharedPreferences("ToDoList",MODE_PRIVATE);
+    public ArrayList<ToDoItem> GetTodoList() {
+        SharedPreferences pref = context.getSharedPreferences("ToDoList", MODE_PRIVATE);
         SharedPreferences.Editor pref_edit = pref.edit();
         Gson gson = new Gson();
-        String json = pref.getString("ToDoList","null");
-        Log.e("json",json);
+        String json = pref.getString("ToDoList", "null");
+        Log.e("json", json);
         ArrayList<ToDoItem> toDoItems_ = new ArrayList<>();
-        if(json !="null") {
-            toDoItems_ = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>(){}.getType());
+        if (json != "null") {
+            toDoItems_ = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>() {
+            }.getType());
         }
         return toDoItems_;
     }
+
     // 아이템 정보 저
-    public void SetTodoList(){
-        SharedPreferences pref = context.getSharedPreferences("ToDoList",MODE_PRIVATE);
+    public void SetTodoList() {
+        SharedPreferences pref = context.getSharedPreferences("ToDoList", MODE_PRIVATE);
         SharedPreferences.Editor pref_edit = pref.edit();
         Gson gson = new Gson();
         String json = gson.toJson(toDoItems);
         pref_edit.remove("ToDoList");
-        pref_edit.putString("ToDoList",json);
+        pref_edit.putString("ToDoList", json);
         pref_edit.apply();
     }
 
 
     @Override
     public void onItemMoved(int fromPosition, int toPosition) {
-        if(fromPosition<toPosition){
-            for(int i=fromPosition; i<toPosition; i++){
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
                 del_Alarm(i);
-                del_Alarm(i+1);
-                Collections.swap(toDoItems, i, i+1);
+                del_Alarm(i + 1);
+                Collections.swap(toDoItems, i, i + 1);
                 add_Alarm(i);
-                add_Alarm(i+1);
+                add_Alarm(i + 1);
             }
-        }
-        else{
-            for(int i=fromPosition; i > toPosition; i--){
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
                 del_Alarm(i);
-                del_Alarm(i-1);
-                Collections.swap(toDoItems, i, i-1);
+                del_Alarm(i - 1);
+                Collections.swap(toDoItems, i, i - 1);
                 add_Alarm(i);
-                add_Alarm(i-1);
+                add_Alarm(i - 1);
             }
         }
         notifyItemMoved(fromPosition, toPosition);
@@ -168,33 +173,35 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
 
 
     @Override
-    public void onItemRemoved(int position ,RecyclerView rv) {
-        View view = LayoutInflater.from(context).inflate(R.layout.activity_main,null);
+    public void onItemRemoved(int position, RecyclerView rv) {
+
+        View view = LayoutInflater.from(context).inflate(R.layout.activity_main, null);
         LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.empty_view);
         linearLayout.setVisibility(View.VISIBLE);
+
         final int pos = position;
-        final ToDoItem todoitem=toDoItems.get(position);
-        Log.e("asdf",toDoItems.size()+"");
-        for(int i=0;i<toDoItems.size();i++){
+        final ToDoItem todoitem = toDoItems.get(position);
+        Log.e("asdf", toDoItems.size() + "");
+        for (int i = 0; i < toDoItems.size(); i++) {
             del_Alarm(i);
         }
         toDoItems.remove(position);
-        Log.e("asdf2",toDoItems.size()+"");
-        for(int i=0;i<toDoItems.size();i++){
+        Log.e("asdf2", toDoItems.size() + "");
+        for (int i = 0; i < toDoItems.size(); i++) {
             add_Alarm(i);
         }
         notifyItemRemoved(position);
         SetTodoList();
-        Snackbar.make(rv,"Deleted Todo",Snackbar.LENGTH_SHORT)
+        Snackbar.make(rv, "Deleted Todo", Snackbar.LENGTH_SHORT)
                 .setAction("UNDO", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        for(int i=0;i<toDoItems.size();i++){
+                        for (int i = 0; i < toDoItems.size(); i++) {
                             del_Alarm(i);
                         }
-                        toDoItems.add(pos,todoitem);
+                        toDoItems.add(pos, todoitem);
                         notifyItemInserted(pos);
-                        for(int i=0;i<toDoItems.size();i++){
+                        for (int i = 0; i < toDoItems.size(); i++) {
                             add_Alarm(i);
                         }
                         MainActivity.setEmpty_view();
@@ -205,10 +212,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ToDoVi
         SetTodoList();
     }
 
-    public static class ToDoViewHolder extends RecyclerView.ViewHolder{
+    public static class ToDoViewHolder extends RecyclerView.ViewHolder {
         TextView todo_list_title;
         TextView todo_list_contents;
         TextView todo_list_date;
+
         public ToDoViewHolder(View itemView) {
             super(itemView);
             todo_list_title = (TextView) itemView.findViewById(R.id.todo_list_title);

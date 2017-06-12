@@ -48,13 +48,13 @@ public class ReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder);
 
-        pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
+        pref = getSharedPreferences("ToDoList", MODE_PRIVATE);
         pref_edit = pref.edit();
         getTodoList();
 
-        Intent intent= getIntent();
-        index = intent.getIntExtra("index",-1);
-        if(index<0){
+        Intent intent = getIntent();
+        index = intent.getIntExtra("index", -1);
+        if (index < 0) {
             Toast.makeText(this, "왜알람이없지?..;", Toast.LENGTH_LONG).show();
             finish();
         }
@@ -68,8 +68,8 @@ public class ReminderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Date date = new Date();
-                date.setTime(date.getTime()+alarm_turm*1000);
-                Calendar calendar= Calendar.getInstance();
+                date.setTime(date.getTime() + alarm_turm * 1000);
+                Calendar calendar = Calendar.getInstance();
                 calendar.setTime(date);
                 toDoItems.get(index).setCalendar(calendar);
                 toDoItems.get(index).setToDoChecked(true);
@@ -83,12 +83,12 @@ public class ReminderActivity extends AppCompatActivity {
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int i=0;i< toDoItems.size();i++){
+                for (int i = 0; i < toDoItems.size(); i++) {
                     del_Alarm(i);
                 }
                 toDoItems.remove(index);
-                for(int i=0;i< toDoItems.size();i++){
-                    if(toDoItems.get(i).isToDoChecked()) {
+                for (int i = 0; i < toDoItems.size(); i++) {
+                    if (toDoItems.get(i).isToDoChecked()) {
                         add_Alarm(i);
                     }
                 }
@@ -98,65 +98,71 @@ public class ReminderActivity extends AppCompatActivity {
         });
 
         //스피너
-        String[] snooze ={"10 Minutes","30 Minutes","1 Hours"};
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.snooze_text,snooze);
+        String[] snooze = {"10 Minutes", "30 Minutes", "1 Hours"};
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.snooze_text, snooze);
         arrayAdapter.setDropDownViewResource(R.layout.snooze_text);
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
+                switch (position) {
                     case 0:
-                        alarm_turm = 60*10;
+                        alarm_turm = 60 * 10;
                         break;
                     case 1:
-                        alarm_turm = 60*30;
+                        alarm_turm = 60 * 30;
                         break;
                     case 2:
-                        alarm_turm = 60*60;
+                        alarm_turm = 60 * 60;
                         break;
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
     }
+
     // 알람 설정
     private void add_Alarm(int index) {
-            Intent intent = new Intent(this, TodoNotificationService.class);
-            intent.putExtra("todoText", toDoItems.get(index).getContents());
-            intent.putExtra("index",index);
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(index).getCalendar().getTimeInMillis()+alarm_turm*1000, pendingIntent);
+        Intent intent = new Intent(this, TodoNotificationService.class);
+        intent.putExtra("todoText", toDoItems.get(index).getContents());
+        intent.putExtra("index", index);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, toDoItems.get(index).getCalendar().getTimeInMillis() + alarm_turm * 1000, pendingIntent);
     }
+
     //알람 삭제
     void del_Alarm(int index) {
-            Intent intent = new Intent(this, MainActivity.class);
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-            alarmManager.cancel(pendingIntent);
+        Intent intent = new Intent(this, MainActivity.class);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(this, index, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.cancel(pendingIntent);
     }
+
     //아이템 정보 가져오기
-    public void getTodoList(){
-        pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
+    public void getTodoList() {
+        pref = getSharedPreferences("ToDoList", MODE_PRIVATE);
         pref_edit = pref.edit();
-        json = pref.getString("ToDoList","null");
-        Log.e("json",json);
-        if(json !="null") {
-            toDoItems = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>(){}.getType());
+        json = pref.getString("ToDoList", "null");
+        Log.e("json", json);
+        if (json != "null") {
+            toDoItems = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>() {
+            }.getType());
         }
     }
+
     //아이템 정보 저장하기
-    public void setTodoList(){
-        pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
+    public void setTodoList() {
+        pref = getSharedPreferences("ToDoList", MODE_PRIVATE);
         pref_edit = pref.edit();
         json = gson.toJson(toDoItems);
         pref_edit.remove("ToDoList");
-        pref_edit.putString("ToDoList",json);
+        pref_edit.putString("ToDoList", json);
         pref_edit.apply();
-        Log.e("json",json);
+        Log.e("json", json);
     }
 }

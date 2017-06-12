@@ -31,7 +31,7 @@ public class TodoNotificationService extends IntentService {
 
     private int index;
     private String todoText;
-    private String todoTitle="Remind";
+    private String todoTitle = "Remind";
 
     public TodoNotificationService() {
         super("");
@@ -39,12 +39,12 @@ public class TodoNotificationService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        index = intent.getIntExtra("index",-1);
+        index = intent.getIntExtra("index", -1);
         todoText = intent.getStringExtra("todoText");
         Context context = getApplicationContext();
-        Intent intent1 = new Intent(context,ReminderActivity.class);
-        intent1.putExtra("index",index);
-        Log.e("noti index",index+"");
+        Intent intent1 = new Intent(context, ReminderActivity.class);
+        intent1.putExtra("index", index);
+        Log.e("noti index", index + "");
         //상단바에띄우기
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification notification = new Notification.Builder(this)
@@ -53,18 +53,19 @@ public class TodoNotificationService extends IntentService {
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentText(todoText)
-                .setContentIntent(PendingIntent.getActivity(context,index,intent1,PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(PendingIntent.getActivity(context, index, intent1, PendingIntent.FLAG_UPDATE_CURRENT))
                 .build();
-        manager.notify(index,notification);
+        manager.notify(index, notification);
 
         //알람 제거된 정보 저장
-        pref = getSharedPreferences("ToDoList",MODE_PRIVATE);
+        pref = getSharedPreferences("ToDoList", MODE_PRIVATE);
         pref_edit = pref.edit();
-        json=pref.getString("ToDoList",null);
-        toDoItems = gson.fromJson(json,new TypeToken<ArrayList<ToDoItem>>(){}.getType());
+        json = pref.getString("ToDoList", null);
+        toDoItems = gson.fromJson(json, new TypeToken<ArrayList<ToDoItem>>() {
+        }.getType());
         toDoItems.get(index).setToDoChecked(false);
-        json=gson.toJson(toDoItems);
-        pref_edit.putString("ToDoList",json);
+        json = gson.toJson(toDoItems);
+        pref_edit.putString("ToDoList", json);
         pref_edit.apply();
     }
 }

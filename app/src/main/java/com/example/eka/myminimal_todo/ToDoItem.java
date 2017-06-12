@@ -15,8 +15,8 @@ public class ToDoItem {
         this.contents = contents;
         this.calendar = calendar;
         this.isToDoChecked = isToDoChecked;
-        String first_char = contents.charAt(0)+"";
-        this.contents = first_char.toUpperCase()+contents.substring(1);
+        String first_char = contents.charAt(0) + "";
+        this.contents = first_char.toUpperCase() + contents.substring(1);
     }
 
     public String getContents() {
