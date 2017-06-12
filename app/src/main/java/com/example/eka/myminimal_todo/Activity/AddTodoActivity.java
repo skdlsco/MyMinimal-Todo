@@ -67,7 +67,9 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         //기본 선언, 초기화
         Intent intent = getIntent();
         Add_Modi = intent.getIntExtra("Add_Modi", -1);
+
         GetTodoList();
+
         remind_title = (EditText) findViewById(R.id.remind_title);
         remind_text = (TextView) findViewById(R.id.remind_text);
         remind_setdate = (Button) findViewById(R.id.set_date_btn);
@@ -172,6 +174,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         }
         calendar.set(year, monthOfYear, dayOfMonth);
         set_date_text();
+        set_remind_text();
     }
 
 
@@ -185,6 +188,7 @@ public class AddTodoActivity extends AppCompatActivity implements DatePickerDial
         }
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hourOfDay, minute, 0);
         set_time_text();
+        set_remind_text();
     }
 
     void add_Alarm() {
